@@ -3,6 +3,7 @@ package com.jphampton.hearthstonecardbacks.carddisplay;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -10,8 +11,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.jphampton.hearthstonecardbacks.R;
+import com.jphampton.hearthstonecardbacks.models.Card;
+import com.jphampton.hearthstonecardbacks.service.HearthstoneServiceImpl;
 
 import java.util.Calendar;
+import java.util.List;
 import java.util.TimeZone;
 
 public class CardDisplay extends AppCompatActivity {
@@ -20,14 +24,19 @@ public class CardDisplay extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_display);
-        TimeZone local = TimeZone.getDefault();
-        Calendar cal = Calendar.getInstance(local);
-        int currentMonthInt = cal.get(Calendar.MONTH);
-        String currentMonth = getResources().getStringArray(R.array.months)[currentMonthInt];
-        setTitle(getString(R.string.card_activity_title, currentMonth));
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        int bob = 1+4;
+
+        TimeZone local = TimeZone.getDefault();
+        Calendar cal = Calendar.getInstance(local);
+        Pair<String, String> monthYear = getMonthAndYear(cal);
+        String currentMonth = monthYear.first;
+        String currentYear = monthYear.second;
+        setTitle(getString(R.string.card_activity_title, currentMonth));
+
+        new HearthstoneServiceImpl().getRankedCards((j)->{});
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -37,6 +46,24 @@ public class CardDisplay extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+    }
+
+    private Pair<String,String> getMonthAndYear(Calendar cal){
+        return Pair.create(getResources().getStringArray(R.array.months)[cal.get(Calendar.MONTH)], cal.get(Calendar.YEAR)+"");
+    }
+
+    private Card getCurrentCard(List<Card> cards, Calendar cal) {
+        Pair<String, String> monthYear = getMonthAndYear(cal);
+        String currentMonth = monthYear.first;
+        String currentYear = monthYear.second;
+        String toFind = currentMonth + " " + currentYear;
+        for(int i = 0; i < cards.size();i++) {
+            Card current = cards.get(i);
+            String desc = current.description;
+            if(desc.contains(toFind)) {
+                return current;
+            }
+        }
     }
 
     @Override

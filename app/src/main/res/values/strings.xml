@@ -16,4 +16,5 @@
         <item>December</item>
     </string-array>
     <string name="card_activity_title">%s\'s Cardback</string>
+    <string name="month_year_format">%1$s %2$s</string>
 </resources>
