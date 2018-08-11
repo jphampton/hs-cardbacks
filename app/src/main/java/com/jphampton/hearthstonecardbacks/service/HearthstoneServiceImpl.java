@@ -92,7 +92,7 @@ public class HearthstoneServiceImpl implements HearthstoneService {
 
     private URLConnection setToken(URL url) throws IOException {
         URLConnection urlConnection = url.openConnection();
-        String authString = "noIs1yrK2emsh89AZyoqeQuOUsuOp1OkPd1jsnZC9nkmoJF8zT";
+        String authString = "samplekey";
         urlConnection.setRequestProperty("X-Mashape-Key", authString);
         return urlConnection;
     }
