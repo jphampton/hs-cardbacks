@@ -17,4 +17,5 @@
     </string-array>
     <string name="card_activity_title">%s\'s Cardback</string>
     <string name="month_year_format">%1$s %2$s</string>
+    <string name="current_cardback_content_description">This month\'s cardback</string>
 </resources>

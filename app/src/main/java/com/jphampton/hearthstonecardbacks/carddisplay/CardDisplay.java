@@ -6,11 +6,14 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 
 import com.jphampton.hearthstonecardbacks.R;
+import com.jphampton.hearthstonecardbacks.glide.GlideApp;
 import com.jphampton.hearthstonecardbacks.models.Card;
 import com.jphampton.hearthstonecardbacks.service.HearthstoneServiceImpl;
 
@@ -25,17 +28,16 @@ public class CardDisplay extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_card_display);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         TimeZone local = TimeZone.getDefault();
         Calendar cal = Calendar.getInstance(local);
         Pair<String, String> monthYear = getMonthAndYear(cal);
         String currentMonth = monthYear.first;
-        String currentYear = monthYear.second;
         setTitle(getString(R.string.card_activity_title, currentMonth));
 
-        new HearthstoneServiceImpl().getRankedCards((j)->{});
+        new HearthstoneServiceImpl().getRankedCards(cardbacks-> displayCardback(cardbacks, cal));
 
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -49,14 +51,30 @@ public class CardDisplay extends AppCompatActivity {
     }
 
     private Pair<String,String> getMonthAndYear(Calendar cal){
-        return Pair.create(getResources().getStringArray(R.array.months)[cal.get(Calendar.MONTH)], cal.get(Calendar.YEAR)+"");
+        return Pair.create(
+            getResources().getStringArray(R.array.months)[cal.get(Calendar.MONTH)],
+            cal.get(Calendar.YEAR)+"");
+    }
+
+    private void displayCardback(List<Card> cards, Calendar cal) {
+        Card currentCard = getCurrentCard(cards, cal);
+        if (currentCard == null) {
+            Log.w("card display", "No card for this month");
+            return;
+        }
+        if (currentCard.imgURL == null || currentCard.imgURL.isEmpty()) {
+            Log.w("card display", "No image url for this card");
+            return;
+        }
+        ImageView cardView = findViewById(R.id.cardback_image);
+        GlideApp.with(cardView.getContext()).load(currentCard.imgURL).fitCenter().into(cardView);
     }
 
     private Card getCurrentCard(List<Card> cards, Calendar cal) {
         Pair<String, String> monthYear = getMonthAndYear(cal);
         String currentMonth = monthYear.first;
         String currentYear = monthYear.second;
-        String toFind = currentMonth + " " + currentYear;
+        String toFind = getString(R.string.month_year_format, currentMonth, currentYear);
         for(int i = 0; i < cards.size();i++) {
             Card current = cards.get(i);
             String desc = current.description;
@@ -64,6 +82,7 @@ public class CardDisplay extends AppCompatActivity {
                 return current;
             }
         }
+        return null;
     }
 
     @Override
