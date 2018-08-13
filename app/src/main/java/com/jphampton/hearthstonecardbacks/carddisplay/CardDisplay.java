@@ -12,6 +12,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
+import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.model.LazyHeaders;
 import com.jphampton.hearthstonecardbacks.R;
 import com.jphampton.hearthstonecardbacks.glide.GlideApp;
 import com.jphampton.hearthstonecardbacks.models.Card;
@@ -67,7 +69,10 @@ public class CardDisplay extends AppCompatActivity {
             return;
         }
         ImageView cardView = findViewById(R.id.cardback_image);
-        GlideApp.with(cardView.getContext()).load(currentCard.imgURL).fitCenter().into(cardView);
+        GlideUrl glideUrl = new GlideUrl(
+            currentCard.imgURL,
+            new LazyHeaders.Builder().addHeader("X-Mashape-Key", "placeholder").build());
+        GlideApp.with(cardView.getContext()).load(glideUrl).fitCenter().into(cardView);
     }
 
     private Card getCurrentCard(List<Card> cards, Calendar cal) {
