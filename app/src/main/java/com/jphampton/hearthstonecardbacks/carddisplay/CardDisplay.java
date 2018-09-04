@@ -3,24 +3,22 @@ package com.jphampton.hearthstonecardbacks.carddisplay;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
 
 import com.bumptech.glide.load.model.GlideUrl;
-import com.bumptech.glide.load.model.LazyHeaders;
+import com.google.common.base.Optional;
 import com.jphampton.hearthstonecardbacks.R;
 import com.jphampton.hearthstonecardbacks.glide.GlideApp;
 import com.jphampton.hearthstonecardbacks.models.Card;
 import com.jphampton.hearthstonecardbacks.service.HearthstoneServiceImpl;
 
+import java.time.Month;
 import java.util.Calendar;
-import java.util.List;
 import java.util.TimeZone;
 
 public class CardDisplay extends AppCompatActivity {
@@ -35,59 +33,35 @@ public class CardDisplay extends AppCompatActivity {
 
         TimeZone local = TimeZone.getDefault();
         Calendar cal = Calendar.getInstance(local);
-        Pair<String, String> monthYear = getMonthAndYear(cal);
-        String currentMonth = monthYear.first;
-        setTitle(getString(R.string.card_activity_title, currentMonth));
+        int monthIndex = cal.get(Calendar.MONTH);
+        Month month = Month.values()[monthIndex];
+        String monthName = getResources().getStringArray(R.array.months)[monthIndex];
+        int year = cal.get(Calendar.YEAR);
+        setTitle(getString(R.string.card_activity_title, monthName));
 
-        new HearthstoneServiceImpl().getRankedCards(cardbacks-> displayCardback(cardbacks, cal));
+        new HearthstoneServiceImpl()
+            .getCardByDate(month, year, cardback -> displayCardback(cardback));
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        FloatingActionButton fab = findViewById(R.id.fab);
+        fab.setOnClickListener(
+            view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                .setAction("Action", null).show());
     }
 
-    private Pair<String,String> getMonthAndYear(Calendar cal){
-        return Pair.create(
-            getResources().getStringArray(R.array.months)[cal.get(Calendar.MONTH)],
-            cal.get(Calendar.YEAR)+"");
-    }
-
-    private void displayCardback(List<Card> cards, Calendar cal) {
-        Card currentCard = getCurrentCard(cards, cal);
-        if (currentCard == null) {
+    private void displayCardback(Optional<Card> cardbackOptional) {
+        if (!cardbackOptional.isPresent()) {
             Log.w("card display", "No card for this month");
             return;
         }
+        Card currentCard = cardbackOptional.get();
         if (currentCard.imgURL == null || currentCard.imgURL.isEmpty()) {
             Log.w("card display", "No image url for this card");
             return;
         }
         ImageView cardView = findViewById(R.id.cardback_image);
-        GlideUrl glideUrl = new GlideUrl(
-            currentCard.imgURL,
-            new LazyHeaders.Builder().addHeader("X-Mashape-Key", "placeholder").build());
+        GlideUrl glideUrl = new GlideUrl(currentCard.imgURL);
         GlideApp.with(cardView.getContext()).load(glideUrl).fitCenter().into(cardView);
-    }
-
-    private Card getCurrentCard(List<Card> cards, Calendar cal) {
-        Pair<String, String> monthYear = getMonthAndYear(cal);
-        String currentMonth = monthYear.first;
-        String currentYear = monthYear.second;
-        String toFind = getString(R.string.month_year_format, currentMonth, currentYear);
-        for(int i = 0; i < cards.size();i++) {
-            Card current = cards.get(i);
-            String desc = current.description;
-            if(desc.contains(toFind)) {
-                return current;
-            }
-        }
-        return null;
     }
 
     @Override
