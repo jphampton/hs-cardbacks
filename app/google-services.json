@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "860864875742",
+    "firebase_url": "https://hearthstonecardbacks-0521.firebaseio.com",
+    "project_id": "hearthstonecardbacks-0521",
+    "storage_bucket": "hearthstonecardbacks-0521.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:860864875742:android:2f931fe8c3f7a835",
+        "android_client_info": {
+          "package_name": "com.jphampton.hearthstonecardbacks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "860864875742-5npva3i3r5t8h1avr93au30ildl23ska.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jphampton.hearthstonecardbacks",
+            "certificate_hash": "c63f67cdc27ff53de15efe52bb9921a15a1e2cd8"
+          }
+        },
+        {
+          "client_id": "860864875742-ncdsv9rfb3pcjlcqntlrg28h8cimckil.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAndQTNN7kTY5b5rXnYs-1SbNxBy6z3fwY"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "860864875742-ncdsv9rfb3pcjlcqntlrg28h8cimckil.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
