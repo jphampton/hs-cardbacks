@@ -1,16 +1,15 @@
 package com.jphampton.hearthstonecardbacks.carddisplay;
 
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.bumptech.glide.load.model.GlideUrl;
+import com.bumptech.glide.load.resource.bitmap.FitCenter;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.google.common.base.Optional;
 import com.jphampton.hearthstonecardbacks.R;
 import com.jphampton.hearthstonecardbacks.glide.GlideApp;
@@ -41,12 +40,6 @@ public class CardDisplay extends AppCompatActivity {
 
         new HearthstoneServiceImpl()
             .getCardByDate(month, year, this::displayCardback);
-
-
-        FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener(
-            view -> Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
     }
 
     private void displayCardback(Optional<Card> cardbackOptional) {
@@ -61,24 +54,16 @@ public class CardDisplay extends AppCompatActivity {
         }
         ImageView cardView = findViewById(R.id.cardback_image);
         GlideUrl glideUrl = new GlideUrl(currentCard.imgURL);
-        GlideApp.with(cardView.getContext()).load(glideUrl).fitCenter().into(cardView);
+        GlideApp
+            .with(cardView.getContext())
+            .load(glideUrl)
+            .transforms(new FitCenter(), new RoundedCorners(getCornerRadius(cardView)))
+            .into(cardView);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_card_display, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+    private int getCornerRadius(View view) {
+      int height = view.getHeight();
+      int width = view.getWidth();
+      return height < 1.5*width ? height/30 : width/20;
     }
 }

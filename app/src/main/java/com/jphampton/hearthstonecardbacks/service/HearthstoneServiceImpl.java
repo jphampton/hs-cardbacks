@@ -44,7 +44,6 @@ public class HearthstoneServiceImpl implements HearthstoneService {
 
   @Nullable
   private Card getCardbackFromServer(Month month, int year) throws IOException {
-    // TODO: call our server endpoint
     Cardback.Builder builder = new Cardback.Builder(
         AndroidHttp.newCompatibleTransport(), new GsonFactory(), null);
     Cardback service = builder.build();
