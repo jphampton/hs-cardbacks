@@ -20,7 +20,12 @@ import java.time.Month;
 import java.util.Calendar;
 import java.util.TimeZone;
 
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
+
 public class CardDisplay extends AppCompatActivity {
+
+    private CompositeDisposable disposables;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,8 +43,14 @@ public class CardDisplay extends AppCompatActivity {
         int year = cal.get(Calendar.YEAR);
         setTitle(getString(R.string.card_activity_title, monthName));
 
-        new HearthstoneServiceImpl()
-            .getCardByDate(month, year, this::displayCardback);
+        disposables.add(new HearthstoneServiceImpl()
+            .getCardByDate(month, year, this::displayCardback));
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        disposables.clear();
     }
 
     private void displayCardback(Optional<Card> cardbackOptional) {
