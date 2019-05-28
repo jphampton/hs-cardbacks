@@ -18,4 +18,6 @@
     <string name="card_activity_title">%s\'s Cardback</string>
     <string name="month_year_format">%1$s %2$s</string>
     <string name="current_cardback_content_description">This month\'s cardback</string>
+    <string name="no_card_message">Something has gone wrong.  We were not able to find a cardback for the current month.</string>
+    <string name="no_image_message">We were not able to find the image for this month\'s cardback.</string>
 </resources>

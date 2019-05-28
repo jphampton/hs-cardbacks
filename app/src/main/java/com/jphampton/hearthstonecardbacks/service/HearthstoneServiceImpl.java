@@ -9,18 +9,7 @@ import com.google.api.client.json.gson.GsonFactory;
 import com.google.common.base.Optional;
 import com.jphampton.hearthstonecardbacks.models.Card;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.net.URLConnection;
 import java.time.Month;
-import java.util.ArrayList;
-import java.util.List;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -43,12 +32,17 @@ public class HearthstoneServiceImpl implements HearthstoneService {
   }
 
   @Nullable
-  private Card getCardbackFromServer(Month month, int year) throws IOException {
+  private Card getCardbackFromServer(Month month, int year) {
     Cardback.Builder builder = new Cardback.Builder(
         AndroidHttp.newCompatibleTransport(), new GsonFactory(), null);
     Cardback service = builder.build();
-    com.endpoints.cardback.cardback.model.Cardback curr = service.currentCardback(month.toString(), year).setKey(PrivateConstants.API_KEY).execute();
-    return cardbackToCard(curr);
+    com.endpoints.cardback.cardback.model.Cardback curr = null;
+    try {
+       curr = service.currentCardback(month.toString(), year).setKey(PrivateConstants.API_KEY).execute();
+    } catch (Exception e) {
+      Log.e("card fetch", e.getMessage());
+    }
+    return curr == null ? null : cardbackToCard(curr);
   }
 
   private Card cardbackToCard(com.endpoints.cardback.cardback.model.Cardback cardback) {

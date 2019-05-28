@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import android.widget.Toast;
 import com.bumptech.glide.load.model.GlideUrl;
 import com.bumptech.glide.load.resource.bitmap.FitCenter;
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
@@ -21,11 +22,10 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.disposables.Disposable;
 
 public class CardDisplay extends AppCompatActivity {
 
-    private CompositeDisposable disposables;
+    private CompositeDisposable disposables = new CompositeDisposable();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +56,13 @@ public class CardDisplay extends AppCompatActivity {
     private void displayCardback(Optional<Card> cardbackOptional) {
         if (!cardbackOptional.isPresent()) {
             Log.w("card display", "No card for this month");
+            displayError(R.string.no_card_message);
             return;
         }
         Card currentCard = cardbackOptional.get();
         if (currentCard.imgURL == null || currentCard.imgURL.isEmpty()) {
             Log.w("card display", "No image url for this card");
+            displayError(R.string.no_image_message);
             return;
         }
         ImageView cardView = findViewById(R.id.cardback_image);
@@ -70,6 +72,11 @@ public class CardDisplay extends AppCompatActivity {
             .load(glideUrl)
             .transforms(new FitCenter(), new RoundedCorners(getCornerRadius(cardView)))
             .into(cardView);
+    }
+
+
+    private void displayError(int messageId) {
+        Toast.makeText(this, messageId, Toast.LENGTH_LONG).show();
     }
 
     private int getCornerRadius(View view) {
