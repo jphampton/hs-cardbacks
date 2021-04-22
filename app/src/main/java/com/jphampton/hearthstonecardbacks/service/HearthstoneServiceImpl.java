@@ -1,8 +1,8 @@
 package com.jphampton.hearthstonecardbacks.service;
 
-import android.support.annotation.Nullable;
 import android.util.Log;
 
+import androidx.annotation.Nullable;
 import com.endpoints.cardback.cardback.Cardback;
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.gson.GsonFactory;
