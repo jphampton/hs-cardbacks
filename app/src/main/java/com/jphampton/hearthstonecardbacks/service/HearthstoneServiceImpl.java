@@ -8,14 +8,23 @@ import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.common.base.Optional;
 import com.jphampton.hearthstonecardbacks.models.Card;
+import com.squareup.okhttp.Credentials;
 
 import java.time.Month;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+import static com.jphampton.hearthstonecardbacks.service.PrivateConstants.CLIENT_ID;
+import static com.jphampton.hearthstonecardbacks.service.PrivateConstants.CLIENT_SECRET;
 
 public class HearthstoneServiceImpl implements HearthstoneService {
 
@@ -33,16 +42,21 @@ public class HearthstoneServiceImpl implements HearthstoneService {
 
   @Nullable
   private Card getCardbackFromServer(Month month, int year) {
-    Cardback.Builder builder = new Cardback.Builder(
-        AndroidHttp.newCompatibleTransport(), new GsonFactory(), null);
-    Cardback service = builder.build();
-    com.endpoints.cardback.cardback.model.Cardback curr = null;
-    try {
-       curr = service.currentCardback(month.toString(), year).setKey(PrivateConstants.API_KEY).execute();
-    } catch (Exception e) {
-      Log.e("card fetch", e.getMessage());
-    }
-    return curr == null ? null : cardbackToCard(curr);
+    BlizzardService.BlizzardAuthService authService = RetrofitClientInstance.getAuthRetrofit().create(BlizzardService.BlizzardAuthService.class);
+    Call<BlizzardAuthResponse> authCall = authService.GetAuthToken(Credentials.basic(CLIENT_ID, CLIENT_SECRET));
+    authCall.enqueue(new Callback<BlizzardAuthResponse>() {
+      @Override
+      public void onResponse(Call<BlizzardAuthResponse> call, Response<BlizzardAuthResponse> response) {
+        BlizzardAuthResponse authResponse = response.body();
+        BlizzardService.BlizzardCardService cardService = RetrofitClientInstance.getCardRetrofit().create(BlizzardService.BlizzardCardService.class);
+        Call<RetroCardResponse> cardResponse = cardService.GetCardByDate(month.getDisplayName(TextStyle.FULL_STANDALONE, Locale.US), Integer.toString(year), authResponse.getAccessToken());
+      }
+
+      @Override
+      public void onFailure(Call<BlizzardAuthResponse> call, Throwable t) {
+
+      }
+    });
   }
 
   private Card cardbackToCard(com.endpoints.cardback.cardback.model.Cardback cardback) {
